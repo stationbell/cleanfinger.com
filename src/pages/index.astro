@@ -38,7 +38,7 @@ const devices = ["monitor", "laptop", "phone"] as const;
 		<main class="main">
 			<section class="copy">
 				<p class="kind">{product.kind}</p>
-				<h1>{product.headline.map((line, i) => (i ? [<br />, line] : line))}</h1>
+				<h1>{product.headline}</h1>
 				<p class="sub">{product.description}</p>
 
 				<div class="buy">
@@ -186,11 +186,13 @@ const devices = ["monitor", "laptop", "phone"] as const;
 		color: var(--accent-text);
 	}
 	h1 {
-		font-size: clamp(2.375rem, min(5vw, 8.4vh), 4.25rem);
+		max-width: 12em;
+		font-size: clamp(2.25rem, min(4.4vw, 7.6vh), 3.875rem);
 		font-weight: 700;
 		font-stretch: 106%;
-		line-height: 0.98;
+		line-height: 1;
 		letter-spacing: -0.03em;
+		text-wrap: balance;
 	}
 	.sub {
 		max-width: 30em;
