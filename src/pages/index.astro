@@ -1,6 +1,5 @@
 ---
 import Base from "../layouts/Base.astro";
-import Logo from "../components/Logo.astro";
 import { product, formattedPrice, cta } from "../data/product";
 
 const year = new Date().getFullYear();
@@ -22,21 +21,23 @@ const jsonLd: Record<string, unknown> = {
 		},
 	}),
 };
+
+// Devices in the illustration, left to right.
+const devices = ["monitor", "laptop", "phone"] as const;
 ---
 
 <Base jsonLd={jsonLd}>
 	<div class="page">
 		<header class="bar">
 			<a class="brand" href="/" aria-label={`${product.name} home`}>
-				<Logo />
-				<span>{product.name}</span>
+				<span class="brand-a">Clean</span><span class="brand-b">Finger</span>
 			</a>
 			<span class="muted">Preorders open</span>
 		</header>
 
 		<main class="main">
 			<section class="copy">
-				<p class="kind muted">{product.kind}</p>
+				<p class="kind">{product.kind}</p>
 				<h1>{product.headline.map((line, i) => (i ? [<br />, line] : line))}</h1>
 				<p class="sub">{product.description}</p>
 
@@ -71,18 +72,49 @@ const jsonLd: Record<string, unknown> = {
 				</ul>
 			</section>
 
-			<figure class="panel">
-				<img
-					class="smudge"
-					src="/smudge.svg"
-					alt="Greasy smudges on a dark screen being wiped away"
-					width="748"
-					height="724"
-					decoding="async"
-					fetchpriority="high"
-				/>
-				<span class="sheen" aria-hidden="true"></span>
-			</figure>
+			<div class="stage">
+				<!-- CSS-only pause control (WCAG 2.2.2): the checkbox pauses every animation in the stage. -->
+				<input class="pause-input" type="checkbox" id="pause-demo" />
+				<label class="pause" for="pause-demo">
+					<span class="pause-label">Pause animation</span>
+					<span class="play-label">Play animation</span>
+				</label>
+
+				<figure
+					class="scene"
+					role="img"
+					aria-label="Without CleanFinger, a greasy fingertip leaves smudges on a laptop screen. With CleanFinger, the fingertip is wiped first, and the screens stay clear."
+				>
+					<p class="state" aria-hidden="true">
+						<span class="state-without">Without {product.name}</span>
+						<span class="state-with">With {product.name}</span>
+					</p>
+
+					<div class="finger" aria-hidden="true">
+						<span class="crease c1"></span>
+						<span class="crease c2"></span>
+						<span class="nail"></span>
+						<img class="grease" src="/grease.svg" alt="" width="100" height="300" decoding="async" />
+						<span class="sheen"></span>
+					</div>
+
+					<div class="devices" aria-hidden="true">
+						{
+							devices.map((d) => (
+								<div class:list={["dev", d]}>
+									<div class="bezel">
+										<div class="screen">
+											<img class="smudge" src="/smudge.svg" alt="" width="748" height="724" decoding="async" />
+										</div>
+									</div>
+									{d === "monitor" && [<span class="m-neck" />, <span class="m-foot" />]}
+									{d === "laptop" && <span class="base" />}
+								</div>
+							))
+						}
+					</div>
+				</figure>
+			</div>
 		</main>
 
 		<footer class="bar foot">
@@ -113,15 +145,19 @@ const jsonLd: Record<string, unknown> = {
 		border-bottom: 1px solid var(--line);
 		font-size: 0.9375rem;
 	}
+	/* Wordmark: one family, two weights. */
 	.brand {
-		display: inline-flex;
-		align-items: center;
-		gap: 10px;
-		text-decoration: none;
-		font-size: 1.1875rem;
-		font-weight: 700;
+		font-size: 1.3125rem;
 		font-stretch: 112%;
-		letter-spacing: -0.01em;
+		letter-spacing: -0.025em;
+		line-height: 1;
+		text-decoration: none;
+	}
+	.brand-a {
+		font-weight: 700;
+	}
+	.brand-b {
+		font-weight: 400;
 	}
 	.foot {
 		height: 56px;
@@ -137,7 +173,7 @@ const jsonLd: Record<string, unknown> = {
 		color: var(--ink);
 	}
 
-	/* Main: copy + buy box | image panel */
+	/* Main: copy + buy box | illustration */
 	.main {
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -156,6 +192,8 @@ const jsonLd: Record<string, unknown> = {
 	.kind {
 		margin-bottom: 16px;
 		font-size: 0.9375rem;
+		font-weight: 600;
+		color: var(--accent-text);
 	}
 	h1 {
 		font-size: clamp(2.375rem, min(5vw, 8.4vh), 4.25rem);
@@ -224,110 +262,413 @@ const jsonLd: Record<string, unknown> = {
 		font-weight: 600;
 	}
 
-	/* Image panel */
-	.panel {
+	/* ---------- Illustration ---------- */
+	.stage {
+		--finger: #d9d3cc;
+		--nail: #ece8e3;
+		--crease: rgb(0 0 0 / 0.1);
+		--bezel: #18191c;
+		--body: #d3d4d8;
+		--glass: #0d0e10;
+		/* How far the fingertip travels down to touch the laptop screen. */
+		--tap: 112px;
 		position: relative;
-		margin: 0;
-		min-height: 420px;
+		align-self: center;
+		height: clamp(400px, 60vh, 540px);
 		border-radius: 12px;
-		background: var(--panel);
+		background: var(--stage);
 		overflow: hidden;
 	}
-	.smudge,
+	@media (prefers-color-scheme: dark) {
+		.stage {
+			--finger: #5a5650;
+			--nail: #6c6862;
+			--crease: rgb(0 0 0 / 0.28);
+			--bezel: #2a2b30;
+			--body: #3b3c42;
+		}
+		.grease {
+			filter: brightness(0.55);
+		}
+	}
+
+	.scene {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		margin: 0;
+		padding: 0 6% 7%;
+	}
+
+	/* Indicator: which scene is playing. */
+	.state {
+		position: absolute;
+		top: 18px;
+		left: 20px;
+		z-index: 3;
+		display: grid;
+		font-size: 0.8125rem;
+		font-weight: 600;
+	}
+	.state > span {
+		grid-area: 1 / 1;
+		white-space: nowrap;
+	}
+	.state > span::before {
+		content: "";
+		display: inline-block;
+		width: 8px;
+		height: 8px;
+		margin-right: 8px;
+		border-radius: 50%;
+		background: currentColor;
+		vertical-align: 0.05em;
+	}
+	.state-without {
+		color: var(--muted);
+	}
+	.state-with {
+		color: var(--accent-text);
+	}
+
+	/* Pause / play */
+	.pause-input {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		opacity: 0;
+	}
+	.pause {
+		position: absolute;
+		right: 12px;
+		top: 10px;
+		z-index: 3;
+		padding: 6px 8px;
+		border-radius: 6px;
+		font-size: 0.75rem;
+		color: var(--muted);
+		cursor: pointer;
+	}
+	.pause:hover {
+		color: var(--ink);
+	}
+	.pause-input:focus-visible + .pause {
+		outline: 2px solid var(--accent);
+		outline-offset: 0;
+	}
+	.play-label,
+	.pause-input:checked + .pause .pause-label {
+		display: none;
+	}
+	.pause-input:checked + .pause .play-label {
+		display: inline;
+	}
+	.stage:has(.pause-input:checked) * {
+		animation-play-state: paused !important;
+	}
+
+	/* Fingertip, pointing down from the top edge (its top runs off the stage),
+	   positioned over the laptop screen. */
+	.finger {
+		position: relative;
+		z-index: 2;
+		flex: 1 1 auto;
+		align-self: flex-start;
+		width: 100px;
+		min-height: 120px;
+		margin: -60px 0 26px calc(68% - 50px);
+		border-radius: 50px;
+		background: var(--finger);
+		overflow: hidden;
+	}
+	.nail {
+		position: absolute;
+		left: 50%;
+		bottom: 9px;
+		width: 62px;
+		height: 74px;
+		transform: translateX(-50%);
+		border-radius: 26px 26px 30px 30px / 22px 22px 40px 40px;
+		background: var(--nail);
+	}
+	.crease {
+		position: absolute;
+		left: 50%;
+		width: 44%;
+		height: 10px;
+		transform: translateX(-50%);
+		border-top: 2px solid var(--crease);
+		border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+	}
+	.c1 {
+		bottom: 112px;
+	}
+	.c2 {
+		bottom: 124px;
+		width: 34%;
+	}
+	.grease,
 	.sheen {
 		position: absolute;
 		inset: 0;
 		width: 100%;
 		height: 100%;
 	}
+
+	/* Devices */
+	.devices {
+		display: flex;
+		align-items: flex-end;
+		justify-content: center;
+		gap: 4%;
+		width: 100%;
+	}
+	.dev {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+	.bezel {
+		width: 100%;
+		padding: 5px;
+		border-radius: 8px;
+		background: var(--bezel);
+	}
+	.screen {
+		position: relative;
+		border-radius: 4px;
+		background: var(--glass);
+		overflow: hidden;
+	}
 	.smudge {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
 		object-fit: cover;
+	}
+	.monitor {
+		width: 46%;
+	}
+	.monitor .screen {
+		aspect-ratio: 16 / 10;
+	}
+	.m-neck {
+		width: 14%;
+		height: 30px;
+		background: var(--body);
+	}
+	.m-foot {
+		width: 38%;
+		height: 6px;
+		border-radius: 3px;
+		background: var(--body);
+	}
+	.laptop {
+		width: 36%;
+	}
+	.laptop .bezel {
+		border-radius: 8px 8px 2px 2px;
+	}
+	.laptop .screen {
+		aspect-ratio: 16 / 10;
+	}
+	.base {
+		width: 118%;
+		height: 9px;
+		border-radius: 0 0 8px 8px;
+		background: var(--body);
+	}
+	.phone {
+		width: 10%;
+	}
+	.phone .bezel {
+		padding: 4px;
+		border-radius: 12px;
+	}
+	.phone .screen {
+		aspect-ratio: 9 / 19;
+		border-radius: 8px;
 	}
 
 	/*
-	 * The wipe. The smudges are masked by a diagonal edge (clean on one side,
-	 * smudged on the other) on a 300% box; sliding the box moves the edge across
-	 * the panel. The glossy band uses the identical gradient geometry, so it
-	 * always sits exactly on that edge. CSS only, no JavaScript.
-	 * Positions: 75% = fully smudged, 25% = fully clean, 50% = half (still frame).
+	 * Two scenes, one 5s loop. Screens are never wiped: smudges only ever
+	 * APPEAR (from a greasy tap) and are reset off-camera during the cut.
+	 *
+	 *  Scene 1 "Without CleanFinger"  0–44%
+	 *    0–4%    fade in (greasy finger, clean screens)
+	 *    10–22%  greasy finger taps the laptop -> smudges appear
+	 *    40–43%  fade out
+	 *  Cut (scene fully hidden 43–45%): screens reset, label switches at 44%
+	 *  Scene 2 "With CleanFinger"  44–100%
+	 *    45–48%  fade in (greasy finger, clean screens)
+	 *    50–64%  the wipe runs down the FINGER
+	 *    68–80%  clean finger taps -> screens stay clear
+	 *    94–98%  fade out; grease resets off-camera
+	 *
+	 * Default (no animation / reduced motion) = scene 2's end state.
 	 */
-	.smudge {
+	.grease {
 		--edge: linear-gradient(135deg, transparent 48.5%, #000 51.5%);
 		-webkit-mask-image: var(--edge);
 		mask-image: var(--edge);
 		-webkit-mask-size: 300% 300%;
 		mask-size: 300% 300%;
-		-webkit-mask-position: 50% 50%;
-		mask-position: 50% 50%;
+		-webkit-mask-position: 25% 25%;
+		mask-position: 25% 25%;
 	}
 	.sheen {
 		background: linear-gradient(
 			135deg,
 			transparent 46.5%,
-			rgb(255 255 255 / 0.05) 48.6%,
-			rgb(255 255 255 / 0.14) 50%,
-			rgb(255 255 255 / 0.05) 51.4%,
+			rgb(255 255 255 / 0.25) 48.6%,
+			rgb(255 255 255 / 0.6) 50%,
+			rgb(255 255 255 / 0.25) 51.4%,
 			transparent 53.5%
 		);
 		background-size: 300% 300%;
-		background-position: 50% 50%;
 		opacity: 0;
-		pointer-events: none;
 	}
+	.smudge,
+	.state-without {
+		opacity: 0;
+	}
+	.pause-input,
+	.pause {
+		display: none;
+	}
+
 	@media (prefers-reduced-motion: no-preference) {
-		.smudge {
-			animation: cf-wipe 6s infinite;
+		.pause {
+			display: block;
+		}
+		.pause-input {
+			display: block;
+		}
+		.scene {
+			animation: cf-scene 5s infinite;
+		}
+		.grease {
+			animation: cf-grease 5s infinite;
 		}
 		.sheen {
-			animation: cf-sheen 6s infinite;
+			animation: cf-sheen 5s infinite;
+		}
+		.finger {
+			animation: cf-tap 5s infinite;
+		}
+		.smudge {
+			animation: cf-smudge 5s infinite;
+		}
+		.state-without {
+			animation: cf-without 5s infinite;
+		}
+		.state-with {
+			animation: cf-with 5s infinite;
 		}
 	}
-	@keyframes cf-wipe {
+
+	@keyframes cf-scene {
+		0% {
+			opacity: 0;
+		}
+		4%,
+		40% {
+			opacity: 1;
+		}
+		43%,
+		45% {
+			opacity: 0;
+		}
+		48%,
+		94% {
+			opacity: 1;
+		}
+		98%,
+		100% {
+			opacity: 0;
+		}
+	}
+	@keyframes cf-without {
 		0%,
-		18% {
+		43.9% {
+			opacity: 1;
+		}
+		44%,
+		100% {
+			opacity: 0;
+		}
+	}
+	@keyframes cf-with {
+		0%,
+		43.9% {
+			opacity: 0;
+		}
+		44%,
+		100% {
+			opacity: 1;
+		}
+	}
+	@keyframes cf-tap {
+		0%,
+		10%,
+		22%,
+		68%,
+		80%,
+		100% {
+			transform: translateY(0);
+		}
+		15%,
+		17%,
+		73%,
+		75% {
+			transform: translateY(var(--tap));
+		}
+	}
+	@keyframes cf-smudge {
+		0%,
+		15% {
+			opacity: 0;
+		}
+		19%,
+		43.9% {
+			opacity: 1;
+		}
+		44%,
+		100% {
+			opacity: 0;
+		}
+	}
+	@keyframes cf-grease {
+		0%,
+		50% {
 			-webkit-mask-position: 75% 75%;
 			mask-position: 75% 75%;
-			opacity: 1;
 			animation-timing-function: cubic-bezier(0.55, 0, 0.3, 1);
 		}
-		48% {
+		64%,
+		98.9% {
 			-webkit-mask-position: 25% 25%;
 			mask-position: 25% 25%;
-			opacity: 1;
 		}
-		80% {
-			-webkit-mask-position: 25% 25%;
-			mask-position: 25% 25%;
-			opacity: 0;
-		}
-		81% {
-			-webkit-mask-position: 75% 75%;
-			mask-position: 75% 75%;
-			opacity: 0;
-		}
+		99%,
 		100% {
 			-webkit-mask-position: 75% 75%;
 			mask-position: 75% 75%;
-			opacity: 1;
 		}
 	}
 	@keyframes cf-sheen {
 		0%,
-		18% {
+		50% {
 			background-position: 75% 75%;
 			opacity: 0;
 			animation-timing-function: cubic-bezier(0.55, 0, 0.3, 1);
 		}
-		22% {
+		52%,
+		62% {
 			opacity: 1;
 		}
-		44% {
-			opacity: 1;
-		}
-		48% {
-			background-position: 25% 25%;
-			opacity: 0;
-		}
+		64%,
 		100% {
 			background-position: 25% 25%;
 			opacity: 0;
@@ -349,10 +690,13 @@ const jsonLd: Record<string, unknown> = {
 		}
 	}
 
-	/* Phones: image strip on top, everything on one screen. */
+	/* Phones: illustration strip on top (laptop + phone), everything on one screen. */
 	@media (max-width: 760px) {
 		.bar {
 			height: 56px;
+		}
+		.brand {
+			font-size: 1.1875rem;
 		}
 		.foot {
 			height: 48px;
@@ -362,10 +706,53 @@ const jsonLd: Record<string, unknown> = {
 			gap: 20px;
 			padding: 12px var(--gutter) 24px;
 		}
-		.panel {
+		.stage {
+			--tap: 36px;
 			order: -1;
+			align-self: stretch;
+			height: 224px;
+		}
+		.scene {
+			padding: 0 12% 16px;
+		}
+		.state {
+			top: 12px;
+			left: auto;
+			right: 14px;
+			font-size: 0.75rem;
+			text-align: right;
+		}
+		.pause {
+			top: 6px;
+			left: 6px;
+			right: auto;
+		}
+		.finger {
+			width: 44px;
 			min-height: 0;
-			height: 180px;
+			margin: -40px 0 14px calc(41% - 22px);
+			border-radius: 22px;
+		}
+		.nail {
+			bottom: 5px;
+			width: 30px;
+			height: 34px;
+			border-radius: 12px 12px 14px 14px / 10px 10px 18px 18px;
+		}
+		.c1 {
+			bottom: 52px;
+		}
+		.c2 {
+			display: none;
+		}
+		.monitor {
+			display: none;
+		}
+		.laptop {
+			width: 54%;
+		}
+		.phone {
+			width: 14%;
 		}
 		.kind {
 			margin-bottom: 10px;
@@ -386,7 +773,7 @@ const jsonLd: Record<string, unknown> = {
 		}
 	}
 	@media (max-width: 760px) and (max-height: 720px) {
-		.panel {
+		.stage {
 			display: none;
 		}
 	}

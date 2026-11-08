@@ -2,10 +2,10 @@
 
 export const product = {
 	name: "CleanFinger",
-	kind: "Fingertip cleaner",
-	headline: ["Clean fingertips.", "Clean screens."],
+	kind: "A wipe for your fingertips, not your screen.",
+	headline: ["Clean finger.", "Clear screen."],
 	description:
-		"Wipe the grease off your fingers in seconds, before it ends up on your keyboard, trackpad, monitor or phone.",
+		"Wipe the grease off your fingertips in seconds, so it never ends up on your keyboard, trackpad, monitor or phone.",
 
 	// Preorder price, shown in the buy box and in search results (e.g. 19). null hides the row.
 	price: null as number | null,
