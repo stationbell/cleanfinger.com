@@ -1,5 +1,6 @@
 ---
 import Base from "../layouts/Base.astro";
+import Logo from "../components/Logo.astro";
 import { product, formattedPrice, cta } from "../data/product";
 
 const year = new Date().getFullYear();
@@ -26,7 +27,10 @@ const jsonLd: Record<string, unknown> = {
 <Base jsonLd={jsonLd}>
 	<div class="page">
 		<header class="bar">
-			<span class="brand">{product.name}</span>
+			<a class="brand" href="/" aria-label={`${product.name} home`}>
+				<Logo />
+				<span>{product.name}</span>
+			</a>
 			<span class="muted">Preorders open</span>
 		</header>
 
@@ -110,6 +114,10 @@ const jsonLd: Record<string, unknown> = {
 		font-size: 0.9375rem;
 	}
 	.brand {
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+		text-decoration: none;
 		font-size: 1.1875rem;
 		font-weight: 700;
 		font-stretch: 112%;
