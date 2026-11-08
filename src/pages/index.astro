@@ -73,13 +73,6 @@ const devices = ["monitor", "laptop", "phone"] as const;
 			</section>
 
 			<div class="stage">
-				<!-- CSS-only pause control (WCAG 2.2.2): the checkbox pauses every animation in the stage. -->
-				<input class="pause-input" type="checkbox" id="pause-demo" />
-				<label class="pause" for="pause-demo">
-					<span class="pause-label">Pause animation</span>
-					<span class="play-label">Play animation</span>
-				</label>
-
 				<figure
 					class="scene"
 					role="img"
@@ -91,11 +84,8 @@ const devices = ["monitor", "laptop", "phone"] as const;
 					</p>
 
 					<div class="finger" aria-hidden="true">
-						<span class="crease c1"></span>
-						<span class="crease c2"></span>
 						<span class="nail"></span>
 						<img class="grease" src="/grease.svg" alt="" width="100" height="300" decoding="async" />
-						<span class="sheen"></span>
 					</div>
 
 					<div class="devices" aria-hidden="true">
@@ -264,9 +254,9 @@ const devices = ["monitor", "laptop", "phone"] as const;
 
 	/* ---------- Illustration ---------- */
 	.stage {
-		--finger: #d9d3cc;
-		--nail: #ece8e3;
-		--crease: rgb(0 0 0 / 0.1);
+		--finger: #ffffff;
+		--finger-line: #d2d3d7;
+		--nail: #f6f6f7;
 		--bezel: #18191c;
 		--body: #d3d4d8;
 		--glass: #0d0e10;
@@ -281,14 +271,14 @@ const devices = ["monitor", "laptop", "phone"] as const;
 	}
 	@media (prefers-color-scheme: dark) {
 		.stage {
-			--finger: #5a5650;
-			--nail: #6c6862;
-			--crease: rgb(0 0 0 / 0.28);
+			--finger: #1d1e21;
+			--finger-line: #3a3b41;
+			--nail: #26272b;
 			--bezel: #2a2b30;
 			--body: #3b3c42;
 		}
 		.grease {
-			filter: brightness(0.55);
+			filter: brightness(0.65);
 		}
 	}
 
@@ -331,42 +321,6 @@ const devices = ["monitor", "laptop", "phone"] as const;
 		color: var(--accent-text);
 	}
 
-	/* Pause / play */
-	.pause-input {
-		position: absolute;
-		width: 1px;
-		height: 1px;
-		opacity: 0;
-	}
-	.pause {
-		position: absolute;
-		right: 12px;
-		top: 10px;
-		z-index: 3;
-		padding: 6px 8px;
-		border-radius: 6px;
-		font-size: 0.75rem;
-		color: var(--muted);
-		cursor: pointer;
-	}
-	.pause:hover {
-		color: var(--ink);
-	}
-	.pause-input:focus-visible + .pause {
-		outline: 2px solid var(--accent);
-		outline-offset: 0;
-	}
-	.play-label,
-	.pause-input:checked + .pause .pause-label {
-		display: none;
-	}
-	.pause-input:checked + .pause .play-label {
-		display: inline;
-	}
-	.stage:has(.pause-input:checked) * {
-		animation-play-state: paused !important;
-	}
-
 	/* Fingertip, pointing down from the top edge (its top runs off the stage),
 	   positioned over the laptop screen. */
 	.finger {
@@ -377,9 +331,12 @@ const devices = ["monitor", "laptop", "phone"] as const;
 		width: 100px;
 		min-height: 120px;
 		margin: -60px 0 26px calc(68% - 50px);
+		border: 1.5px solid var(--finger-line);
 		border-radius: 50px;
 		background: var(--finger);
 		overflow: hidden;
+		-webkit-mask-image: linear-gradient(to bottom, transparent, #000 55%);
+		mask-image: linear-gradient(to bottom, transparent, #000 55%);
 	}
 	.nail {
 		position: absolute;
@@ -388,27 +345,11 @@ const devices = ["monitor", "laptop", "phone"] as const;
 		width: 62px;
 		height: 74px;
 		transform: translateX(-50%);
+		border: 1.5px solid var(--finger-line);
 		border-radius: 26px 26px 30px 30px / 22px 22px 40px 40px;
 		background: var(--nail);
 	}
-	.crease {
-		position: absolute;
-		left: 50%;
-		width: 44%;
-		height: 10px;
-		transform: translateX(-50%);
-		border-top: 2px solid var(--crease);
-		border-radius: 50% 50% 0 0 / 100% 100% 0 0;
-	}
-	.c1 {
-		bottom: 112px;
-	}
-	.c2 {
-		bottom: 124px;
-		width: 34%;
-	}
-	.grease,
-	.sheen {
+	.grease {
 		position: absolute;
 		inset: 0;
 		width: 100%;
@@ -502,57 +443,24 @@ const devices = ["monitor", "laptop", "phone"] as const;
 	 *  Cut (scene fully hidden 43–45%): screens reset, label switches at 44%
 	 *  Scene 2 "With CleanFinger"  44–100%
 	 *    45–48%  fade in (greasy finger, clean screens)
-	 *    50–64%  the wipe runs down the FINGER
+	 *    50–60%  the grease on the FINGER fades away (no wiping motion)
 	 *    68–80%  clean finger taps -> screens stay clear
 	 *    94–98%  fade out; grease resets off-camera
 	 *
 	 * Default (no animation / reduced motion) = scene 2's end state.
 	 */
-	.grease {
-		--edge: linear-gradient(135deg, transparent 48.5%, #000 51.5%);
-		-webkit-mask-image: var(--edge);
-		mask-image: var(--edge);
-		-webkit-mask-size: 300% 300%;
-		mask-size: 300% 300%;
-		-webkit-mask-position: 25% 25%;
-		mask-position: 25% 25%;
-	}
-	.sheen {
-		background: linear-gradient(
-			135deg,
-			transparent 46.5%,
-			rgb(255 255 255 / 0.25) 48.6%,
-			rgb(255 255 255 / 0.6) 50%,
-			rgb(255 255 255 / 0.25) 51.4%,
-			transparent 53.5%
-		);
-		background-size: 300% 300%;
-		opacity: 0;
-	}
+	.grease,
 	.smudge,
 	.state-without {
 		opacity: 0;
 	}
-	.pause-input,
-	.pause {
-		display: none;
-	}
 
 	@media (prefers-reduced-motion: no-preference) {
-		.pause {
-			display: block;
-		}
-		.pause-input {
-			display: block;
-		}
 		.scene {
 			animation: cf-scene 5s infinite;
 		}
 		.grease {
 			animation: cf-grease 5s infinite;
-		}
-		.sheen {
-			animation: cf-sheen 5s infinite;
 		}
 		.finger {
 			animation: cf-tap 5s infinite;
@@ -642,36 +550,15 @@ const devices = ["monitor", "laptop", "phone"] as const;
 	@keyframes cf-grease {
 		0%,
 		50% {
-			-webkit-mask-position: 75% 75%;
-			mask-position: 75% 75%;
-			animation-timing-function: cubic-bezier(0.55, 0, 0.3, 1);
+			opacity: 1;
 		}
-		64%,
+		60%,
 		98.9% {
-			-webkit-mask-position: 25% 25%;
-			mask-position: 25% 25%;
+			opacity: 0;
 		}
 		99%,
 		100% {
-			-webkit-mask-position: 75% 75%;
-			mask-position: 75% 75%;
-		}
-	}
-	@keyframes cf-sheen {
-		0%,
-		50% {
-			background-position: 75% 75%;
-			opacity: 0;
-			animation-timing-function: cubic-bezier(0.55, 0, 0.3, 1);
-		}
-		52%,
-		62% {
 			opacity: 1;
-		}
-		64%,
-		100% {
-			background-position: 25% 25%;
-			opacity: 0;
 		}
 	}
 
@@ -722,11 +609,6 @@ const devices = ["monitor", "laptop", "phone"] as const;
 			font-size: 0.75rem;
 			text-align: right;
 		}
-		.pause {
-			top: 6px;
-			left: 6px;
-			right: auto;
-		}
 		.finger {
 			width: 44px;
 			min-height: 0;
@@ -738,12 +620,6 @@ const devices = ["monitor", "laptop", "phone"] as const;
 			width: 30px;
 			height: 34px;
 			border-radius: 12px 12px 14px 14px / 10px 10px 18px 18px;
-		}
-		.c1 {
-			bottom: 52px;
-		}
-		.c2 {
-			display: none;
 		}
 		.monitor {
 			display: none;
