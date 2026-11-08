@@ -1,11 +1,10 @@
-// Everything on the storefront comes from this file. Edit here, not in the page.
-
-export type Feature = { title: string; body: string; icon: "drop" | "leaf" | "bolt" | "shield" };
+// Everything on the page comes from this file. Edit here, not in the page.
 
 export const product = {
 	name: "CleanFinger",
-	tagline: "Clean fingertips, anywhere.",
-	description: "Wipe away grease, crumbs and sticky bits in seconds. No sink, no napkin, no mess. Preorders are open now.",
+	headline: "Clean fingertips in seconds.",
+	description:
+		"Take the grease off your fingers before it ends up on your keyboard, trackpad, monitor or phone.",
 
 	// Preorder price, shown on the button and in search results (e.g. 19). null hides it.
 	price: null as number | null,
@@ -17,29 +16,13 @@ export const product = {
 
 	contactEmail: "hello@cleanfinger.com",
 
-	// One line under the button.
-	ctaNote: "First batch. Cancel anytime before it ships.",
+	// One line under the button. Make sure it matches your actual policy.
+	ctaNote: "Ships from the first batch. Cancel anytime before it ships.",
 
-	features: [
-		{ title: "Seconds, not sinks", body: "Clean fingertips without getting up.", icon: "bolt" },
-		{ title: "Goes everywhere", body: "Desk, car, couch, bag.", icon: "drop" },
-		{ title: "Gentle on skin", body: "Made for hands you use all day.", icon: "leaf" },
-	] satisfies Feature[],
-
-	// Make sure these answers match how you actually handle preorders.
-	faq: [
-		{
-			q: "When will my order ship?",
-			a: "Preorders ship from the first production run. We'll email you a ship date as soon as it's set, and tracking once it's on the way.",
-		},
-		{
-			q: "Can I cancel my preorder?",
-			a: "Yes. Email us any time before it ships for a full refund.",
-		},
-		{
-			q: "Questions?",
-			a: "Email hello@cleanfinger.com and a real person will get back to you.",
-		},
+	facts: [
+		{ title: "Quick", body: "A few seconds, right at your desk." },
+		{ title: "Easy", body: "No sink. No getting up." },
+		{ title: "Smudge-free", body: "Cleaner keys, trackpads and screens." },
 	],
 };
 
@@ -55,5 +38,4 @@ const reserveHref = `mailto:${product.contactEmail}?subject=${encodeURIComponent
 export const cta = {
 	href: takesPayment ? product.checkoutUrl : reserveHref,
 	label: takesPayment ? `Preorder${formattedPrice ? ` — ${formattedPrice}` : " now"}` : "Reserve yours",
-	short: takesPayment ? "Preorder" : "Reserve",
 };
