@@ -2,13 +2,15 @@
 
 export const product = {
 	name: "CleanFinger",
-	headline: "Clean fingertips in seconds.",
+	kind: "Fingertip cleaner",
+	headline: ["Clean fingertips.", "Clean screens."],
 	description:
-		"Take the grease off your fingers before it ends up on your keyboard, trackpad, monitor or phone.",
+		"Wipe the grease off your fingers in seconds, before it ends up on your keyboard, trackpad, monitor or phone.",
 
-	// Preorder price, shown on the button and in search results (e.g. 19). null hides it.
+	// Preorder price, shown in the buy box and in search results (e.g. 19). null hides the row.
 	price: null as number | null,
 	currency: "USD",
+	availability: "Preorder · first batch",
 
 	// Paste a checkout link (Stripe Payment Link, Shopify, Lemon Squeezy, …) to take paid preorders.
 	// While empty, the button opens an email so people can reserve one.
@@ -17,12 +19,12 @@ export const product = {
 	contactEmail: "hello@cleanfinger.com",
 
 	// One line under the button. Make sure it matches your actual policy.
-	ctaNote: "Ships from the first batch. Cancel anytime before it ships.",
+	ctaNote: "Cancel anytime before it ships.",
 
-	facts: [
-		{ title: "Quick", body: "A few seconds, right at your desk." },
-		{ title: "Easy", body: "No sink. No getting up." },
-		{ title: "Smudge-free", body: "Cleaner keys, trackpads and screens." },
+	benefits: [
+		{ title: "Seconds", body: "Use it mid-task." },
+		{ title: "No sink", body: "Right where you work." },
+		{ title: "Fewer smudges", body: "Keys and screens stay clean." },
 	],
 };
 
@@ -37,5 +39,5 @@ const reserveHref = `mailto:${product.contactEmail}?subject=${encodeURIComponent
 
 export const cta = {
 	href: takesPayment ? product.checkoutUrl : reserveHref,
-	label: takesPayment ? `Preorder${formattedPrice ? ` — ${formattedPrice}` : " now"}` : "Reserve yours",
+	label: takesPayment ? "Preorder now" : "Reserve yours",
 };

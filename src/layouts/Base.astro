@@ -10,7 +10,7 @@ interface Props {
 }
 
 const {
-	title = `${product.name} — ${product.headline}`,
+	title = `${product.name} — ${product.headline.join(" ")}`,
 	description = product.description,
 	jsonLd,
 	noindex = false,
@@ -32,10 +32,11 @@ const ld = jsonLd ? JSON.stringify(jsonLd).replace(/</g, "\\u003c") : null;
 		<link rel="canonical" href={canonical} />
 		{noindex && <meta name="robots" content="noindex" />}
 
+		<link rel="preload" href="/fonts/archivo-var-latin.woff2" as="font" type="font/woff2" crossorigin />
 		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 		<meta name="color-scheme" content="light dark" />
-		<meta name="theme-color" content="#fafaf9" media="(prefers-color-scheme: light)" />
-		<meta name="theme-color" content="#0e0e0e" media="(prefers-color-scheme: dark)" />
+		<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+		<meta name="theme-color" content="#0c0c0d" media="(prefers-color-scheme: dark)" />
 		<link rel="sitemap" href="/sitemap-index.xml" />
 
 		<meta property="og:type" content="website" />
@@ -56,28 +57,43 @@ const ld = jsonLd ? JSON.stringify(jsonLd).replace(/</g, "\\u003c") : null;
 </html>
 
 <style is:global>
+	/* Archivo (SIL OFL, see /fonts/OFL.txt), subset to basic Latin. Weight 400–700, width 100–125%. */
+	@font-face {
+		font-family: "Archivo";
+		src: url("/fonts/archivo-var-latin.woff2") format("woff2");
+		font-weight: 400 700;
+		font-stretch: 100% 125%;
+		font-display: swap;
+	}
+
 	:root {
-		--bg: #fafaf9;
-		--ink: #111111;
-		--muted: #6b6b68;
-		--line: #e4e4e0;
-		--btn-bg: #111111;
-		--btn-ink: #ffffff;
-		--btn-hover: #333333;
-		--font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-		--wrap: min(1080px, 100% - 32px);
+		--bg: #ffffff;
+		--ink: #0c0c0d;
+		--muted: #5e6066;
+		--line: #ececee;
+		--panel: #0d0e10;
+		--accent: #2340f5;
+		--accent-hover: #1a33d6;
+		--font: "Archivo", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+		--gutter: 48px;
 		color-scheme: light dark;
 	}
 
 	@media (prefers-color-scheme: dark) {
 		:root {
-			--bg: #0e0e0e;
-			--ink: #f2f2f0;
-			--muted: #9b9b97;
-			--line: #262626;
-			--btn-bg: #f2f2f0;
-			--btn-ink: #111111;
-			--btn-hover: #d4d4d0;
+			--bg: #0c0c0d;
+			--ink: #f3f3f4;
+			--muted: #a0a2a8;
+			--line: #232427;
+			--panel: #16171a;
+			--accent: #4a63ff;
+			--accent-hover: #3a54f5;
+		}
+	}
+
+	@media (max-width: 760px) {
+		:root {
+			--gutter: 16px;
 		}
 	}
 
@@ -96,13 +112,15 @@ const ld = jsonLd ? JSON.stringify(jsonLd).replace(/</g, "\\u003c") : null;
 		margin: 0;
 		background: var(--bg);
 		color: var(--ink);
-		font: 400 1.0625rem/1.55 var(--font);
+		font: 400 1rem/1.5 var(--font);
 		-webkit-font-smoothing: antialiased;
 	}
 
 	h1,
-	h2,
-	p {
+	p,
+	dl,
+	dd,
+	ul {
 		margin: 0;
 	}
 
@@ -111,30 +129,25 @@ const ld = jsonLd ? JSON.stringify(jsonLd).replace(/</g, "\\u003c") : null;
 	}
 
 	:focus-visible {
-		outline: 2px solid var(--ink);
+		outline: 2px solid var(--accent);
 		outline-offset: 3px;
 	}
 
-	.wrap {
-		width: var(--wrap);
-		margin-inline: auto;
-	}
-
 	.btn {
-		display: inline-flex;
+		display: flex;
 		align-items: center;
 		justify-content: center;
-		min-height: 52px;
+		height: 56px;
 		padding: 0 28px;
-		border-radius: 6px;
-		background: var(--btn-bg);
-		color: var(--btn-ink);
+		border-radius: 8px;
+		background: var(--accent);
+		color: #ffffff;
+		font-size: 1.0625rem;
 		font-weight: 600;
-		font-size: 1rem;
 		text-decoration: none;
 		transition: background-color 0.15s ease;
 	}
 	.btn:hover {
-		background: var(--btn-hover);
+		background: var(--accent-hover);
 	}
 </style>
