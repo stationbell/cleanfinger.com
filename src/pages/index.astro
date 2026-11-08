@@ -1,50 +1,448 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import Base from "../layouts/Base.astro";
+import Mark from "../components/Mark.astro";
+import Icon from "../components/Icon.astro";
+import { product, formattedPrice, cta } from "../data/product";
+
+const year = new Date().getFullYear();
+
+const jsonLd: Record<string, unknown> = {
+	"@context": "https://schema.org",
+	"@type": "Product",
+	name: product.name,
+	description: product.description,
+	image: new URL("/og.png", Astro.site).href,
+	brand: { "@type": "Brand", name: product.name },
+	...(product.price !== null && {
+		offers: {
+			"@type": "Offer",
+			price: product.price.toFixed(2),
+			priceCurrency: product.currency,
+			availability: "https://schema.org/PreOrder",
+			url: Astro.site?.href,
+		},
+	}),
+};
 ---
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
-		<Header />
-		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This
-				template serves as a lightweight, minimally-styled starting point for anyone looking to build
-				a personal website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your
-				<code>astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
+<Base jsonLd={jsonLd}>
+	<header class="top">
+		<div class="wrap top-inner">
+			<a class="brand" href="/" aria-label={`${product.name} home`}>
+				<Mark size={30} />
+				<span>{product.name}</span>
+			</a>
+			<a class="btn btn--sm" href={cta.href}>{cta.short}</a>
+		</div>
+	</header>
+
+	<main id="main">
+		<section class="hero">
+			<div class="wrap hero-grid">
+				<div class="hero-copy">
+					<p class="status">
+						<span class="status-dot" aria-hidden="true"></span>
+						Preorders open
+					</p>
+					<h1>{product.name}</h1>
+					<p class="tagline">{product.tagline}</p>
+					<p class="lede">{product.description}</p>
+
+					{formattedPrice && <p class="price">{formattedPrice}</p>}
+
+					<a class="btn btn--lg" href={cta.href}>{cta.label}</a>
+					<p class="note">{product.ctaNote}</p>
+				</div>
+
+				<div class="hero-art" aria-hidden="true">
+					<svg class="art" viewBox="0 0 480 480" focusable="false">
+						<defs>
+							<radialGradient id="halo" cx="50%" cy="50%" r="50%">
+								<stop offset="0%" class="stop-soft"></stop>
+								<stop offset="100%" class="stop-clear"></stop>
+							</radialGradient>
+							<linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
+								<stop offset="0%" class="stop-surface"></stop>
+								<stop offset="100%" class="stop-soft"></stop>
+							</linearGradient>
+						</defs>
+						<circle cx="240" cy="240" r="236" fill="url(#halo)"></circle>
+						<rect class="tile" x="110" y="110" width="260" height="260" rx="72" fill="url(#tile)"></rect>
+						<g class="tile-mark" fill="none" stroke-width="16" stroke-linecap="round">
+							<path d="M186 330V246a54 54 0 0 1 108 0v84"></path>
+							<path d="M212 312V250a28 28 0 0 1 56 0v62"></path>
+							<path d="M240 294v-38"></path>
+						</g>
+						<path class="spark" d="M330 112q4 26 30 30-26 4-30 30-4-26-30-30 26-4 30-30z"></path>
+						<circle class="bubble b1" cx="96" cy="150" r="18"></circle>
+						<circle class="bubble b2" cx="392" cy="352" r="26"></circle>
+						<circle class="bubble b3" cx="120" cy="388" r="11"></circle>
+						<circle class="bubble b4" cx="404" cy="218" r="9"></circle>
+					</svg>
+				</div>
+			</div>
+		</section>
+
+		<section class="section" aria-label="Why CleanFinger">
+			<ul class="wrap features">
+				{
+					product.features.map((f) => (
+						<li>
+							<span class="feat-icon">
+								<Icon name={f.icon} />
+							</span>
+							<div>
+								<h2>{f.title}</h2>
+								<p>{f.body}</p>
+							</div>
+						</li>
+					))
+				}
 			</ul>
-			<p>
-				Have fun! If you get stuck, remember to <a href="https://docs.astro.build/"
-					>read the docs
-				</a> or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out <a
-					href="https://github.com/Charca/astro-blog-template"
-					>astro-blog-template
-				</a> by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
-		</main>
-		<Footer />
-	</body>
-</html>
+		</section>
+
+		<section id="faq" class="section">
+			<div class="wrap faq-wrap">
+				<h2 class="faq-title">Preorder FAQ</h2>
+				<div class="faq">
+					{
+						product.faq.map((item) => (
+							<details>
+								<summary>{item.q}</summary>
+								<p>{item.a}</p>
+							</details>
+						))
+					}
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<footer class="foot">
+		<div class="wrap foot-inner">
+			<p>© {year} {product.name}</p>
+			<a href={`mailto:${product.contactEmail}`}>{product.contactEmail}</a>
+		</div>
+	</footer>
+</Base>
+
+<style>
+	/* Header */
+	.top {
+		position: sticky;
+		top: 0;
+		z-index: 10;
+		background: color-mix(in srgb, var(--bg) 82%, transparent);
+		backdrop-filter: saturate(1.6) blur(14px);
+		-webkit-backdrop-filter: saturate(1.6) blur(14px);
+		border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+	}
+	.top-inner {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		height: 68px;
+	}
+	.brand {
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+		font-family: var(--font-display);
+		font-weight: 750;
+		font-size: 1.1875rem;
+		letter-spacing: -0.02em;
+		text-decoration: none;
+		color: var(--ink);
+	}
+	.brand :global(.mark) {
+		color: var(--accent);
+	}
+
+	/* Hero */
+	.hero {
+		padding: clamp(40px, 8vw, 104px) 0 clamp(48px, 8vw, 104px);
+		overflow: clip;
+	}
+	.hero-grid {
+		display: grid;
+		gap: 40px;
+		align-items: center;
+	}
+	@media (min-width: 900px) {
+		.hero-grid {
+			grid-template-columns: 1.05fr 1fr;
+			gap: 56px;
+		}
+	}
+	.status {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		padding: 6px 14px 6px 12px;
+		border-radius: 999px;
+		background: var(--accent-soft);
+		color: var(--accent);
+		font-size: 0.875rem;
+		font-weight: 650;
+	}
+	.status-dot {
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		background: currentColor;
+	}
+	@media (prefers-reduced-motion: no-preference) {
+		.status-dot {
+			animation: pulse 2.4s ease-out infinite;
+		}
+	}
+	@keyframes pulse {
+		0% {
+			box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 55%, transparent);
+		}
+		70%,
+		100% {
+			box-shadow: 0 0 0 10px transparent;
+		}
+	}
+	h1 {
+		margin-top: 22px;
+		font-size: clamp(3rem, 9vw, 5.75rem);
+		font-weight: 800;
+		letter-spacing: -0.045em;
+		line-height: 0.95;
+	}
+	.tagline {
+		margin-top: 14px;
+		font-family: var(--font-display);
+		font-size: clamp(1.375rem, 3vw, 1.875rem);
+		font-weight: 600;
+		letter-spacing: -0.02em;
+		color: var(--accent);
+	}
+	.lede {
+		margin-top: 18px;
+		max-width: 32rem;
+		font-size: 1.125rem;
+		color: var(--muted);
+	}
+	.price {
+		margin-top: 24px;
+		font-family: var(--font-display);
+		font-size: 1.75rem;
+		font-weight: 700;
+		letter-spacing: -0.02em;
+	}
+	.btn--lg {
+		margin-top: 30px;
+		min-height: 56px;
+		padding: 0 32px;
+		font-size: 1.0625rem;
+	}
+	.note {
+		margin-top: 14px;
+		font-size: 0.875rem;
+		color: var(--muted);
+	}
+
+	/* Hero illustration (decorative) */
+	.hero-art {
+		max-width: 340px;
+		width: 100%;
+		margin-inline: auto;
+	}
+	@media (min-width: 900px) {
+		.hero-art {
+			max-width: 500px;
+		}
+	}
+	.art {
+		display: block;
+		width: 100%;
+		height: auto;
+	}
+	.stop-soft {
+		stop-color: var(--accent-soft);
+	}
+	.stop-clear {
+		stop-color: var(--bg);
+		stop-opacity: 0;
+	}
+	.stop-surface {
+		stop-color: var(--surface);
+	}
+	.tile {
+		stroke: var(--line);
+		stroke-width: 1.5;
+	}
+	.tile-mark {
+		stroke: var(--accent);
+	}
+	.spark {
+		fill: var(--spark);
+	}
+	.bubble {
+		fill: var(--surface);
+		stroke: var(--accent);
+		stroke-opacity: 0.35;
+		stroke-width: 2;
+	}
+	@media (prefers-reduced-motion: no-preference) {
+		.bubble {
+			animation: float 7s ease-in-out infinite;
+		}
+		.b2 {
+			animation-duration: 9s;
+			animation-delay: -2s;
+		}
+		.b3 {
+			animation-duration: 6s;
+			animation-delay: -4s;
+		}
+		.b4 {
+			animation-duration: 8s;
+			animation-delay: -1s;
+		}
+		.spark {
+			transform-origin: 330px 142px;
+			animation: twinkle 4s ease-in-out infinite;
+		}
+	}
+	@keyframes float {
+		50% {
+			transform: translateY(-14px);
+		}
+	}
+	@keyframes twinkle {
+		50% {
+			transform: scale(0.8) rotate(20deg);
+			opacity: 0.7;
+		}
+	}
+
+	/* Sections */
+	.section {
+		padding: clamp(48px, 8vw, 88px) 0;
+		border-top: 1px solid var(--line);
+	}
+
+	/* Features */
+	.features {
+		display: grid;
+		gap: 28px;
+		margin-block: 0;
+		padding-inline: 0;
+		list-style: none;
+	}
+	@media (min-width: 760px) {
+		.features {
+			grid-template-columns: repeat(3, 1fr);
+			gap: 40px;
+		}
+	}
+	.features li {
+		display: flex;
+		gap: 16px;
+		align-items: flex-start;
+	}
+	.feat-icon {
+		display: inline-grid;
+		place-items: center;
+		flex: none;
+		width: 48px;
+		height: 48px;
+		border-radius: 14px;
+		background: var(--accent-soft);
+		color: var(--accent);
+	}
+	.features h2 {
+		margin-top: 2px;
+		font-size: 1.1875rem;
+		font-weight: 700;
+		letter-spacing: -0.015em;
+	}
+	.features p {
+		margin-top: 4px;
+		color: var(--muted);
+	}
+
+	/* FAQ */
+	.faq-wrap {
+		display: grid;
+		gap: 24px;
+	}
+	@media (min-width: 900px) {
+		.faq-wrap {
+			grid-template-columns: 1fr 1.6fr;
+			gap: 64px;
+		}
+	}
+	.faq-title {
+		font-size: clamp(1.75rem, 4vw, 2.5rem);
+		font-weight: 750;
+		letter-spacing: -0.035em;
+	}
+	.faq {
+		border-top: 1px solid var(--line);
+	}
+	.faq details {
+		border-bottom: 1px solid var(--line);
+	}
+	.faq summary {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 16px;
+		padding: 20px 0;
+		font-weight: 600;
+		font-size: 1.0625rem;
+		cursor: pointer;
+		list-style: none;
+	}
+	.faq summary::-webkit-details-marker {
+		display: none;
+	}
+	.faq summary::after {
+		content: "+";
+		flex: none;
+		display: grid;
+		place-items: center;
+		width: 30px;
+		height: 30px;
+		border-radius: 50%;
+		background: var(--accent-soft);
+		color: var(--accent);
+		font-size: 1.25rem;
+		font-weight: 500;
+		line-height: 1;
+		transition: transform 0.2s ease;
+	}
+	.faq details[open] summary::after {
+		transform: rotate(45deg);
+	}
+	.faq details p {
+		padding: 0 46px 22px 0;
+		color: var(--muted);
+	}
+
+	/* Footer */
+	.foot {
+		padding: 32px 0 40px;
+		border-top: 1px solid var(--line);
+		font-size: 0.9375rem;
+		color: var(--muted);
+	}
+	.foot-inner {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		gap: 12px;
+	}
+	.foot a {
+		text-decoration: none;
+	}
+	.foot a:hover {
+		color: var(--ink);
+		text-decoration: underline;
+	}
+</style>

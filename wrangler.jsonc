@@ -1,0 +1,12 @@
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	// Must match the Worker name in the Cloudflare dashboard (Workers Builds checks it).
+	"name": "astro-blog-starter-template",
+	"compatibility_date": "2026-11-04",
+	// Static assets only: no Worker script, so every request is served from the edge.
+	"assets": {
+		"directory": "./dist",
+		"html_handling": "auto-trailing-slash",
+		"not_found_handling": "404-page"
+	}
+}
